@@ -79,6 +79,44 @@ edge tables (
 
 ---- Parte 3: Trabajar en Graph Studio 
 
+-- Agregar las columnas que faltan
+ALTER TABLE CUSTOMERS ADD (LATITUDE NUMBER, LONGITUDE NUMBER, CITY_NAME VARCHAR2(50));
+
+BEGIN
+    UPDATE CUSTOMERS SET LATITUDE = 4.7110, LONGITUDE = -74.0721, CITY_NAME = 'Bogotá' WHERE CUSTOMER_ID = 1;
+    UPDATE CUSTOMERS SET LATITUDE = 6.2442, LONGITUDE = -75.5812, CITY_NAME = 'Medellín' WHERE CUSTOMER_ID = 2;
+    UPDATE CUSTOMERS SET LATITUDE = 3.4516, LONGITUDE = -76.5320, CITY_NAME = 'Cali' WHERE CUSTOMER_ID = 3;
+    UPDATE CUSTOMERS SET LATITUDE = 10.9685, LONGITUDE = -74.7813, CITY_NAME = 'Barranquilla' WHERE CUSTOMER_ID = 4;
+    UPDATE CUSTOMERS SET LATITUDE = 10.3910, LONGITUDE = -75.4794, CITY_NAME = 'Cartagena' WHERE CUSTOMER_ID = 5;
+    UPDATE CUSTOMERS SET LATITUDE = 7.1193, LONGITUDE = -73.1227, CITY_NAME = 'Bucaramanga' WHERE CUSTOMER_ID = 6;
+    UPDATE CUSTOMERS SET LATITUDE = 4.8133, LONGITUDE = -75.6961, CITY_NAME = 'Pereira' WHERE CUSTOMER_ID = 7;
+    UPDATE CUSTOMERS SET LATITUDE = 5.0702, LONGITUDE = -75.5138, CITY_NAME = 'Manizales' WHERE CUSTOMER_ID = 8;
+    UPDATE CUSTOMERS SET LATITUDE = 11.2404, LONGITUDE = -74.1990, CITY_NAME = 'Santa Marta' WHERE CUSTOMER_ID = 9;
+    COMMIT;
+END;
+/
+
+-- Borramos el grafo viejo
+DROP PROPERTY GRAPH IF EXISTS moviestreams_pg;
+
+-- Creamos el nuevo con las columnas geográficas
+CREATE PROPERTY GRAPH moviestreams_pg
+VERTEX TABLES (
+    customers
+    KEY(customer_id)
+    LABEL customer
+    PROPERTIES (customer_id, first_name, last_name, latitude, longitude, city_name)
+)
+EDGE TABLES (
+    customer_relationships AS related
+    KEY (id)
+    SOURCE KEY(source_id) REFERENCES customers(customer_id)
+    DESTINATION KEY(target_id) REFERENCES customers(customer_id)
+    PROPERTIES (id, relationship)
+);
+
+
+
 ---- Parte 4: Eliminar los recursos creados
 drop table if exists customer_relationships CASCADE CONSTRAINTS;
 drop table if exists customers CASCADE CONSTRAINTS;
