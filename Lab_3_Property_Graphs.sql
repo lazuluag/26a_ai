@@ -116,8 +116,19 @@ EDGE TABLES (
 );
 
 
+--- En Graph Studio: 
+%pgql-pgx
+/* Traemos explícitamente las propiedades para obligar a la herramienta a verlas */
+SELECT v, v.first_name AS Nombre_Origen, e, e.relationship AS Tipo_Relacion, t, t.first_name AS Nombre_Destino
+FROM MATCH (v)-[e]->(t) ON moviestreams_pg
+LIMIT 50
+
 
 ---- Parte 4: Eliminar los recursos creados
 drop table if exists customer_relationships CASCADE CONSTRAINTS;
 drop table if exists customers CASCADE CONSTRAINTS;
 drop property graph moviestreams_pg;
+
+
+
+
